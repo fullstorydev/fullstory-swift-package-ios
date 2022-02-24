@@ -1,0 +1,41 @@
+# This workflow checks to see if there is a newer version of the FullStory iOS plugin that is not listed in this repository.
+# If a newer version exists, it updates the Package.swift file, commits the changes, and tags the change with the new version.
+
+name: Update Swift Package Version
+on:
+  # Allow manually triggering this workflow.
+  workflow_dispatch:
+  # Check every day at 2000 UTC, which is 3PM EST, 4PM EDT.
+  # FullStory plugin releases generally go live at 2PM ET.
+  schedule:
+    - cron: '0 20 * * *'
+
+jobs:
+  check-version:
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Check for newer release
+      run: |
+        version=$(curl -sS "https://ios-releases.fullstory.com/VERSION")
+        if [[ -z "$version" ]]; then
+          echo "Error fetching current release version!"
+          exit 1;
+        fi
+        echo "Current FS iOS release version: $version"
+        if [ $(git tag -l "$version") ]; then
+          echo "Version $version exists in this repo, nothing to do."
+          exit 0
+        fi
+        echo "Tag not found, updating repo."
+
+        # Fetch the Package.swift for this version.
+        curl -sS "https://ios-releases.fullstory.com/fullstory-${version}-xcframework-Package.swift" > Package.swift
+
+        # Commit the changes, tag them, push it all
+        git config user.email "action@github.com"
+        git config user.name "GitHub Actions"
+        git commit -am "Update package for ${version} release"
+        git tag $version
+        git push --tags origin master
