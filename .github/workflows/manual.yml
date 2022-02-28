@@ -2,13 +2,15 @@
 # If a newer version exists, it updates the Package.swift file, commits the changes, and tags the change with the new version.
 
 name: Update Swift Package Version
-on:
-  # Allow manually triggering this workflow.
-  workflow_dispatch:
-  # Check every day at 2000 UTC, which is 3PM EST, 4PM EDT.
-  # FullStory plugin releases generally go live at 2PM ET.
-  schedule:
-    - cron: '0 20 * * *'
+# temp changes just to test this
+on: push
+# on:
+#   # Allow manually triggering this workflow.
+#   workflow_dispatch:
+#   # Check every day at 2000 UTC, which is 3PM EST, 4PM EDT.
+#   # FullStory plugin releases generally go live at 2PM ET.
+#   schedule:
+#     - cron: '0 20 * * *'
 
 jobs:
   check-version:
