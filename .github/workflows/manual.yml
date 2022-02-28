@@ -2,15 +2,13 @@
 # If a newer version exists, it updates the Package.swift file, commits the changes, and tags the change with the new version.
 
 name: Update Swift Package Version
-# temp changes just to test this
-on: push
-# on:
-#   # Allow manually triggering this workflow.
-#   workflow_dispatch:
-#   # Check every day at 2000 UTC, which is 3PM EST, 4PM EDT.
-#   # FullStory plugin releases generally go live at 2PM ET.
-#   schedule:
-#     - cron: '0 20 * * *'
+on:
+  # Allow manually triggering this workflow.
+  workflow_dispatch:
+  # Check every day at 2000 UTC, which is 3PM EST, 4PM EDT.
+  # FullStory plugin releases generally go live at 2PM ET.
+  schedule:
+    - cron: '0 20 * * *'
 
 jobs:
   check-version:
@@ -37,22 +35,18 @@ jobs:
         
         # extract the license file
         url=$(sed -n -E 's/[[:space:]]*url: "([^"]+)",/\1/p' Package.swift)
-        echo "Downloading $url"
+        echo "Downloading $url to update LICENSE.md"
         curl -sS $url > /tmp/fullstory.zip
+        echo "Extracting ACKNOWLEDGEMENTS.md"
         pushd /tmp
         unzip fullstory.zip FullStory.xcframework/ACKNOWLEDGEMENTS.md
         popd
         mv /tmp/FullStory.xcframework/ACKNOWLEDGEMENTS.md LICENSE.md
-        # temporarily needed until the file is committed the first time
-        git add LICENSE.md
-        # just for testing
-        git status
-        git diff --cached
 
         # Commit the changes, tag them, push it all
         # disabled for testing
         git config user.email "action@github.com"
         git config user.name "GitHub Actions"
-        #git commit -am "Update package for ${version} release"
-        #git tag $version
-        #git push --tags origin master
+        git commit -am "Update package for ${version} release"
+        git tag $version
+        git push --tags origin master
