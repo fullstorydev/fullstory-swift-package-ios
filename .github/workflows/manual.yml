@@ -32,6 +32,10 @@ jobs:
 
         # Fetch the Package.swift for this version.
         curl -sS "https://ios-releases.fullstory.com/fullstory-${version}-xcframework-Package.swift" > Package.swift
+        
+        which jq
+        which node
+        which nodejs
 
         # Commit the changes, tag them, push it all
         git config user.email "action@github.com"
