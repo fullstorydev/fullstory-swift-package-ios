@@ -42,9 +42,9 @@ jobs:
         pushd /tmp
         unzip fullstory.zip FullStory.xcframework/ACKNOWLEDGEMENTS.md
         popd
-        mv /tmp/FullStory.xcframework/ACKNOWLEDGEMENTS.md LICENSE
+        mv /tmp/FullStory.xcframework/ACKNOWLEDGEMENTS.md LICENSE.md
         # temporarily needed until the file is committed the first time
-        git add LICENSE
+        git add LICENSE.md
         # just for testing
         git status
         git diff --cached
