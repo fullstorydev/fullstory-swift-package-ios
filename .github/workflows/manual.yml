@@ -42,12 +42,17 @@ jobs:
         pushd /tmp
         unzip fullstory.zip FullStory.xcframework/ACKNOWLEDGEMENTS.md
         popd
-        mv tmp/ACKNOWLEDGEMENTS.md LICENSE
+        mv tmp/FullStory.xcframework/ACKNOWLEDGEMENTS.md LICENSE
+        # temporarily needed until the file is committed the first time
         git add LICENSE
+        # just for testing
+        git status
+        git diff
 
         # Commit the changes, tag them, push it all
+        # disabled for testing
         git config user.email "action@github.com"
         git config user.name "GitHub Actions"
-        git commit -am "Update package for ${version} release"
-        git tag $version
-        git push --tags origin master
+        #git commit -am "Update package for ${version} release"
+        #git tag $version
+        #git push --tags origin master
