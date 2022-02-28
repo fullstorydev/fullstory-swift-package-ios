@@ -47,7 +47,7 @@ jobs:
         git add LICENSE
         # just for testing
         git status
-        git diff
+        git diff --cached
 
         # Commit the changes, tag them, push it all
         # disabled for testing
