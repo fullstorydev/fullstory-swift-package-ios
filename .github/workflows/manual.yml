@@ -35,9 +35,15 @@ jobs:
         # Fetch the Package.swift for this version.
         curl -sS "https://ios-releases.fullstory.com/fullstory-${version}-xcframework-Package.swift" > Package.swift
         
-        which jq
-        which node
-        which nodejs
+        # extract the license file
+        url=$(sed -n -E 's/[[:space:]]*url: "([^"]+)",/\1/p' Package.swift)
+        echo "Downloading $url"
+        curl -sS $url > /tmp/fullstory.zip
+        pushd /tmp
+        unzip fullstory.zip FullStory.xcframework/ACKNOWLEDGEMENTS.md
+        popd
+        mv tmp/ACKNOWLEDGEMENTS.md LICENSE
+        git add LICENSE
 
         # Commit the changes, tag them, push it all
         git config user.email "action@github.com"
