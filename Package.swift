@@ -12,8 +12,8 @@ let package = Package(
     targets: [
         .binaryTarget(
             name: "FullStory",
-            url: "https://ios-releases.fullstory.com/fullstory-1.39.1-xcframework.zip",
-            checksum: "b33aa414e1d4e5f170be9d9058aeeacbbd1b1b5ff36a3d470ca42841030a43e7"
+            url: "https://ios-releases.fullstory.com/fullstory-1.40.0-xcframework.zip",
+            checksum: "65e8f38543203343900f4e1e98ecc5340625cce91f544041365bc05691395ea1"
         ),
     ]
 )
