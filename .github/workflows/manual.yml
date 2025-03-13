@@ -19,6 +19,7 @@ jobs:
       with:
         # Fetch all tags
         fetch-depth: 0
+        persist-credentials: false
     - name: Check for newer release
       run: |
         version=$(curl -sS "https://ios-releases.fullstory.com/VERSION")
