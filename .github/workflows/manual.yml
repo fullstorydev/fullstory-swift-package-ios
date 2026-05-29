@@ -15,7 +15,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-    - uses: actions/checkout@v3
+    - uses: actions/checkout@v6
       with:
         # Fetch all tags
         fetch-depth: 0
@@ -36,9 +36,11 @@ jobs:
         # Fetch the Package.swift for this version.
         curl -sS "https://ios-releases.fullstory.com/fullstory-${version}-xcframework-Package.swift" > Package.swift
 
-        # Commit the changes, tag them, push it all
-        git config user.email "action@github.com"
-        git config user.name "GitHub Actions"
-        git commit -am "Update package for ${version} release"
+        # Commit the changes, tag them, push it all.
+        # This bot account is the one GitHub recommends for actions that push commits.
+        git config user.name "github-actions[bot]"
+        git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+        git add Package.swift
+        git commit -m "Update package for ${version} release"
         git tag $version
         git push --tags origin master
