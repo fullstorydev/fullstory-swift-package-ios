@@ -3,8 +3,14 @@
 
 name: Update Swift Package Version
 on:
-  # Allow manually triggering this workflow.
+  # Allow manually triggering this workflow. The FullStory deploy also runs it right
+  # after an iOS release goes out, passing in the version it just released.
   workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version to tag, like 1.2.3. Leave empty to use the latest release.'
+        required: false
+        type: string
   # Check every day at 2000 UTC, which is 3PM EST, 4PM EDT.
   # FullStory plugin releases generally go live at 2PM ET.
   schedule:
@@ -14,19 +20,33 @@ jobs:
   check-version:
     runs-on: ubuntu-latest
 
+    # The job commits and tags, so it needs a write token. Ask for it here instead
+    # of relying on the repo setting.
+    permissions:
+      contents: write
+
     steps:
     - uses: actions/checkout@v6
       with:
         # Fetch all tags
         fetch-depth: 0
     - name: Check for newer release
+      env:
+        INPUT_VERSION: ${{ inputs.version }}
       run: |
-        version=$(curl -sS "https://ios-releases.fullstory.com/VERSION")
+        # The CDN can serve a cached copy for up to an hour, so add a query string
+        # to make sure we get the latest file.
+        nocache="nocache=$(date +%s)"
+
+        version="$INPUT_VERSION"
         if [[ -z "$version" ]]; then
-          echo "Error fetching current release version!"
+          version=$(curl -sSf "https://ios-releases.fullstory.com/VERSION?${nocache}" || true)
+        fi
+        if [[ ! "$version" =~ ^[0-9]+\.[0-9]+\.[0-9]+$ ]]; then
+          echo "Error getting the release version! Got: '${version}'"
           exit 1;
         fi
-        echo "Current FS iOS release version: $version"
+        echo "FS iOS release version: $version"
         if [ $(git tag -l "$version") ]; then
           echo "Version $version exists in this repo, nothing to do."
           exit 0
@@ -34,7 +54,14 @@ jobs:
         echo "Tag not found, updating repo."
 
         # Fetch the Package.swift for this version.
-        curl -sS "https://ios-releases.fullstory.com/fullstory-${version}-xcframework-Package.swift" > Package.swift
+        curl -sSf "https://ios-releases.fullstory.com/fullstory-${version}-xcframework-Package.swift?${nocache}" > Package.swift
+
+        # Don't commit and tag an error page if the download failed.
+        if ! grep -q "swift-tools-version" Package.swift; then
+          echo "Downloaded Package.swift for ${version} doesn't look like a Swift manifest!"
+          git checkout Package.swift
+          exit 1
+        fi
 
         # Commit the changes, tag them, push it all.
         # This bot account is the one GitHub recommends for actions that push commits.
